@@ -19,16 +19,20 @@ def GUI():
 
 def userLinks():
 	lstLink = []
+	titlelst = []
 
-	linkAmount = 2 #int(input("Entre amount of items you wanna be tracked: "))
-	groupName = input("Entre name for this graph: ")
+	linkAmount = int(input("Entre amount of items you wanna be tracked: "))
 
 	for i in range(linkAmount):
 		url = input("Entre Amazon item URL (page of item you wanna track): ")
 		links = url.rsplit("/", 1)[0]
 		lstLink.append(links)
 
-	return lstLink,groupName
+		# Change this to user entering name	
+		userName = input("Entre name of Item: ")
+		titlelst.append(userName)
+
+	return lstLink,titlelst
 
 def getPriceURL(lst):
 	priceLst = []
@@ -43,20 +47,22 @@ def getPriceURL(lst):
 
 		soup = BeautifulSoup(page.content, 'html.parser')
 
-		price = soup.find_all("span",id="priceblock_ourprice")[0].get_text()
+		price = soup.find_all("span",id="priceblock_ourprice")[0].get_text() # Will have to change this for all type of ID types FUCK AMAZON!
 
 		priceLst.append(float(price[1:]))
 
-		#Change this to user entering name	
+		# Remove this
+
 		title = soup.find_all("span",id="productTitle")[0].get_text()
 		title = title.replace("\n","")
-
+ 
 		if len(title) > 18:
 			titlelst.append(title[:19])
 		else:
 			titlelst.append(title)
 
-	return priceLst,titlelst
+	return priceLst
+
 
 def drawGraph(pricelst,lst):
 	x = np.array(lst)
@@ -75,11 +81,17 @@ def main():
 	index = 1 #GUI()
 
 	if 	index == 1:
-		groupName = "Test"
+		itemNames = ["Samsung","Phone2"]
 		linkLst = ["https://www.amazon.co.uk/Samsung-Galaxy-Android-Smartphone-Version/dp/B08SMS5WMZ/","https://www.amazon.co.uk/Sim-Free-Unlocked-OUKITEL-6-4Inches-Smartphone-Black/dp/B08RDB89QR/"]
-		#linkLst, groupName = userLinks()
-		priceLst,title = getPriceURL(linkLst)
-		drawGraph(priceLst,title)
-		#storeGraph(groupName,linkLst,priceLst)
+		#linkLst, itemNames = userLinks()
+		priceLst = getPriceURL(linkLst)
+		drawGraph(priceLst,itemNames)
+		#storeGraph(linkLst,priceLst)
 
 main()
+
+
+# File System
+# New = create a text file with first line link list and +2nd (onwards) are the old prices
+# Load = If New compare if there is a change in pricing if no change dont create new line if some change create new one if all change create new line
+# Delete = Delete File 
