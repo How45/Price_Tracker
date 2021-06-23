@@ -47,6 +47,7 @@ def getPriceURL(lst):
 
 		priceLst.append(float(price[1:]))
 
+		#Change this to user entering name	
 		title = soup.find_all("span",id="productTitle")[0].get_text()
 		title = title.replace("\n","")
 
