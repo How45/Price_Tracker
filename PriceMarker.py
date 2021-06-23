@@ -80,6 +80,5 @@ def main():
 		priceLst,title = getPriceURL(linkLst)
 		drawGraph(priceLst,title)
 		#storeGraph(groupName,linkLst,priceLst)
-		print("test For git")
 
 main()
