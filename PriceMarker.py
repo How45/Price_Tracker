@@ -2,6 +2,8 @@ from bs4 import BeautifulSoup
 import requests
 import matplotlib.pyplot as plt
 import numpy as np
+import os
+
 
 def GUI():
 	print("""
@@ -21,6 +23,7 @@ def userLinks():
 	lstLink = []
 	titlelst = []
 
+	fileName = input("Entre name of graph: ")
 	linkAmount = int(input("Entre amount of items you wanna be tracked: "))
 
 	for i in range(linkAmount):
@@ -32,7 +35,7 @@ def userLinks():
 		userName = input("Entre name of Item: ")
 		titlelst.append(userName)
 
-	return lstLink,titlelst
+	return lstLink,titlelst,fileName
 
 def getPriceURL(lst):
 	priceLst = []
@@ -73,25 +76,55 @@ def drawGraph(pricelst,lst):
 	plt.waitforbuttonpress(0)
 	plt.close()
 
-def storeGraph(name,objects,price):
-	print(":")
+def storeGraph(links,price,name):
+	file = open(name+".txt","w") # For error Handling (To stop repeating names, change this to x (w = write / x = create))
+	
+	for i in links:
+		file.write(i+" ")
+	file.write("\n")
 
+	for i in price:
+		file.write(str(i)+" ")
+
+def load(name,newPrices):
+	print(":")
+	# priceLst = getPriceURL(linkLst)
+
+def delete(name):
+	if os.path.exists(name+".txt"):
+		os.remove(name+".txt")
+		print("Deleted "+name)
 
 def main():
 	index = 1 #GUI()
 
 	if 	index == 1:
-		itemNames = ["Samsung","Phone2"]
+
+		fileName = "Phones"
+		itemNames = ["Samsung","Phone 2"]
 		linkLst = ["https://www.amazon.co.uk/Samsung-Galaxy-Android-Smartphone-Version/dp/B08SMS5WMZ/","https://www.amazon.co.uk/Sim-Free-Unlocked-OUKITEL-6-4Inches-Smartphone-Black/dp/B08RDB89QR/"]
-		#linkLst, itemNames = userLinks()
+		# linkLst, itemNames, fileName = userLinks()
 		priceLst = getPriceURL(linkLst)
+		
+		storeGraph(linkLst,priceLst,fileName)
 		drawGraph(priceLst,itemNames)
-		#storeGraph(linkLst,priceLst)
+
+	elif index == 2:
+		for i in os.listdir():
+			if i.endswith(".txt"):
+				print(i)
+		name = input("Entre name of graph (without .txt): ")
+
+
+
+	elif index == 3:
+		for i in os.listdir():
+			if i.endswith(".txt"):
+				print(i)
+
+		name = input("Entre name of graph (without .txt): ")
+		delete(name)
 
 main()
 
-
-# File System
-# New = create a text file with first line link list and +2nd (onwards) are the old prices
 # Load = If New compare if there is a change in pricing if no change dont create new line if some change create new one if all change create new line
-# Delete = Delete File 
