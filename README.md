@@ -12,7 +12,7 @@ At the moment:
 1. Get given items (Done)
 2. find them, get prices (Done)
 3. print them off on a graph (Done)
-4. Save graph - 1. Store it as a list / Dictionary then you redraw the old and new points.
+4. Save graph - 1. Store it as a list / Dictionary then you redraw the old and new points. (Done kinda)
 5. Each time you run the program you get a choice to DELETE, CREATE NEW, LOOK AT SAVED GRAPHS 
 5.5 If loading graph it shows old points and new
 6. When you wanna LOOK at old graph it runs the program again giving the old and new dots / prices of the chosen objects
