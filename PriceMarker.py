@@ -76,19 +76,55 @@ def drawGraph(pricelst,lst):
 	plt.waitforbuttonpress(0)
 	plt.close()
 
-def storeGraph(links,price,name):
-	file = open(name+".txt","w") # For error Handling (To stop repeating names, change this to x (w = write / x = create))
+def storeGraph(links,price,fileName,name):
+	file = open(fileName+".txt","w") # For error Handling (To stop repeating names, change this to x (w = write / x = create))
 	
 	for i in links:
 		file.write(i+" ")
 	file.write("\n")
 
+	for i in name:
+		file.write(i+" ")
+	file.write("\n")
+
 	for i in price:
 		file.write(str(i)+" ")
+	file.close()
 
-def load(name,newPrices):
-	print(":")
-	# priceLst = getPriceURL(linkLst)
+def load(name):
+	file = open(name+".txt","r")
+
+	
+	allPrices = []
+	graphName = []
+	link = []
+	
+	index = 0
+	# Get all info 1) Links to find new prices 2) get name always stored on line 2 3) line 3 onwards are all the price from old on top to new at the very bottom
+	for line in file:
+		tempPrice = []
+		index += 1
+
+		if index == 1:
+			for word in line.split():
+				link.append(word)
+				newPrice = getPriceURL(link)
+		elif index == 2:
+			for word in line.split():
+				graphName.append(word)
+		else:
+			for word in line.split():
+				tempPrice.append(word)
+			allPrices.append(tempPrice)
+
+	for i in range(len(newPrice)):
+		if float(newPrice[i]) == float(allPrices[-1][i]):
+			print("Same")
+		else:
+			print("Add")
+		
+	file.close()
+
 
 def delete(name):
 	if os.path.exists(name+".txt"):
@@ -96,7 +132,7 @@ def delete(name):
 		print("Deleted "+name)
 
 def main():
-	index = 1 #GUI()
+	index = 2 #GUI()
 
 	if 	index == 1:
 
@@ -106,14 +142,16 @@ def main():
 		# linkLst, itemNames, fileName = userLinks()
 		priceLst = getPriceURL(linkLst)
 		
-		storeGraph(linkLst,priceLst,fileName)
+		storeGraph(linkLst,priceLst,fileName,itemNames)
 		drawGraph(priceLst,itemNames)
 
 	elif index == 2:
 		for i in os.listdir():
 			if i.endswith(".txt"):
 				print(i)
-		name = input("Entre name of graph (without .txt): ")
+		name = "Phones"#name = input("Entre name of graph (without .txt): ")
+
+		load(name)
 
 
 
