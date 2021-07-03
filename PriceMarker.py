@@ -70,8 +70,13 @@ def getPriceURL(lst):
 def drawGraph(pricelst,lst):
 	x = np.array(lst)
 	y = np.array(pricelst)
-
-	plt.plot(x,y, 'ro')
+	
+	for i in y:
+		print(x,i)
+		if (i == y[-1]).all():
+			plt.plot(x,y, ".")
+		else:
+			plt.plot(x,y, ".")
 	plt.draw()
 	plt.waitforbuttonpress(0)
 	plt.close()
@@ -93,7 +98,6 @@ def storeGraph(links,price,fileName,name):
 
 def load(name):
 	file = open(name+".txt","r")
-
 	
 	allPrices = []
 	graphName = []
@@ -108,7 +112,8 @@ def load(name):
 		if index == 1:
 			for word in line.split():
 				link.append(word)
-				newPrice = getPriceURL(link)
+				# newPrice = getPriceURL(link)
+				newPrice = [159.0, 119.99]
 		elif index == 2:
 			for word in line.split():
 				graphName.append(word)
@@ -117,11 +122,18 @@ def load(name):
 				tempPrice.append(word)
 			allPrices.append(tempPrice)
 
-	for i in range(len(newPrice)):
-		if float(newPrice[i]) == float(allPrices[-1][i]):
-			print("Same")
-		else:
-			print("Add")
+	# Check if there is any new prices
+	for i in range(0,len(allPrices)):
+		for k in range(0,len(allPrices[i])):
+			allPrices[i][k] = float(allPrices[i][k])
+		
+	if newPrice == allPrices[-1]:
+		print("Continue with the most recent price")
+		drawGraph(allPrices,graphName)
+
+	else: 
+		print("add newPrice to all price, also update the file")
+			
 		
 	file.close()
 
