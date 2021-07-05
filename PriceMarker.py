@@ -31,7 +31,7 @@ def userLinks():
 		links = url.rsplit("/", 1)[0]
 		lstLink.append(links)
 
-		# Change this to user entering name	
+		# Change this to user entering name
 		userName = input("Entre name of Item: ")
 		titlelst.append(userName)
 
@@ -54,11 +54,11 @@ def getPriceURL(lst):
 
 		priceLst.append(float(price[1:]))
 
-		# Remove this
+		# Remove this V no need for title, use can create its own title
 
 		title = soup.find_all("span",id="productTitle")[0].get_text()
 		title = title.replace("\n","")
- 
+
 		if len(title) > 18:
 			titlelst.append(title[:19])
 		else:
@@ -70,20 +70,22 @@ def getPriceURL(lst):
 def drawGraph(pricelst,lst):
 	x = np.array(lst)
 	y = np.array(pricelst)
-	
+
 	for i in y:
 		print(x,i)
 		if (i == y[-1]).all():
-			plt.plot(x,y, ".")
+			plt.plot(x,i, "b")
 		else:
-			plt.plot(x,y, ".")
+			plt.plot(x,i, "r.")
 	plt.draw()
-	plt.waitforbuttonpress(0)
+	while True:
+		if plt.waitforbuttonpress():
+			break
 	plt.close()
 
 def storeGraph(links,price,fileName,name):
 	file = open(fileName+".txt","w") # For error Handling (To stop repeating names, change this to x (w = write / x = create))
-	
+
 	for i in links:
 		file.write(i+" ")
 	file.write("\n")
@@ -98,11 +100,11 @@ def storeGraph(links,price,fileName,name):
 
 def load(name):
 	file = open(name+".txt","r")
-	
+
 	allPrices = []
 	graphName = []
 	link = []
-	
+
 	index = 0
 	# Get all info 1) Links to find new prices 2) get name always stored on line 2 3) line 3 onwards are all the price from old on top to new at the very bottom
 	for line in file:
@@ -113,7 +115,7 @@ def load(name):
 			for word in line.split():
 				link.append(word)
 				# newPrice = getPriceURL(link)
-				newPrice = [159.0, 119.99]
+				newPrice = [243.0, 439.99]
 		elif index == 2:
 			for word in line.split():
 				graphName.append(word)
@@ -121,21 +123,31 @@ def load(name):
 			for word in line.split():
 				tempPrice.append(word)
 			allPrices.append(tempPrice)
+	file.close()
 
-	# Check if there is any new prices
+	# Check if there is any new prices (V this for loop changes prices on file into float)
 	for i in range(0,len(allPrices)):
 		for k in range(0,len(allPrices[i])):
 			allPrices[i][k] = float(allPrices[i][k])
-		
+
+	# If statment sees if the newPrice found online is still the same as the most recent price on the file
 	if newPrice == allPrices[-1]:
-		print("Continue with the most recent price")
+		print("Drawing")
 		drawGraph(allPrices,graphName)
 
-	else: 
+	else:
+		file = open(name+".txt","a")
 		print("add newPrice to all price, also update the file")
-			
-		
-	file.close()
+
+		storePrice = newPrice
+		for i in range(0,len(storePrice)):
+			storePrice[i] = str(storePrice[i])
+
+		file.write("\n")
+		for i in storePrice:
+			file.write(i+" ")
+		file.close()
+		load(name)
 
 
 def delete(name):
@@ -153,9 +165,9 @@ def main():
 		linkLst = ["https://www.amazon.co.uk/Samsung-Galaxy-Android-Smartphone-Version/dp/B08SMS5WMZ/","https://www.amazon.co.uk/Sim-Free-Unlocked-OUKITEL-6-4Inches-Smartphone-Black/dp/B08RDB89QR/"]
 		# linkLst, itemNames, fileName = userLinks()
 		priceLst = getPriceURL(linkLst)
-		
+
 		storeGraph(linkLst,priceLst,fileName,itemNames)
-		drawGraph(priceLst,itemNames)
+		drawGraph(priceLst,itemNames)# See if this still works??!
 
 	elif index == 2:
 		for i in os.listdir():
@@ -164,7 +176,6 @@ def main():
 		name = "Phones"#name = input("Entre name of graph (without .txt): ")
 
 		load(name)
-
 
 
 	elif index == 3:
@@ -176,5 +187,3 @@ def main():
 		delete(name)
 
 main()
-
-# Load = If New compare if there is a change in pricing if no change dont create new line if some change create new one if all change create new line
