@@ -31,7 +31,6 @@ def userLinks():
 		links = url.rsplit("/", 1)[0]
 		lstLink.append(links)
 
-		# Change this to user entering name
 		userName = input("Entre name of Item: ")
 		titlelst.append(userName)
 
@@ -56,13 +55,13 @@ def getPriceURL(lst):
 
 		# Remove this V no need for title, use can create its own title
 
-		title = soup.find_all("span",id="productTitle")[0].get_text()
-		title = title.replace("\n","")
+		# title = soup.find_all("span",id="productTitle")[0].get_text()
+		# title = title.replace("\n","")
 
-		if len(title) > 18:
-			titlelst.append(title[:19])
-		else:
-			titlelst.append(title)
+		# if len(title) > 18:
+		# 	titlelst.append(title[:19])
+		# else:
+		# 	titlelst.append(title)
 
 	return priceLst
 
@@ -84,7 +83,7 @@ def drawGraph(pricelst,lst):
 	plt.close()
 
 def storeGraph(links,price,fileName,name):
-	file = open(fileName+".txt","w") # For error Handling (To stop repeating names, change this to x (w = write / x = create))
+	file = open(fileName+".txt","x") # For error Handling (if error go back to menu)
 
 	for i in links:
 		file.write(i+" ")
@@ -156,14 +155,11 @@ def delete(name):
 		print("Deleted "+name)
 
 def main():
-	index = 2 #GUI()
+	index = GUI()
 
 	if 	index == 1:
 
-		fileName = "Phones"
-		itemNames = ["Samsung","Phone 2"]
-		linkLst = ["https://www.amazon.co.uk/Samsung-Galaxy-Android-Smartphone-Version/dp/B08SMS5WMZ/","https://www.amazon.co.uk/Sim-Free-Unlocked-OUKITEL-6-4Inches-Smartphone-Black/dp/B08RDB89QR/"]
-		# linkLst, itemNames, fileName = userLinks()
+		linkLst, itemNames, fileName = userLinks()
 		priceLst = getPriceURL(linkLst)
 
 		storeGraph(linkLst,priceLst,fileName,itemNames)
@@ -173,7 +169,7 @@ def main():
 		for i in os.listdir():
 			if i.endswith(".txt"):
 				print(i)
-		name = "Phones"#name = input("Entre name of graph (without .txt): ")
+		name = input("Entre name of graph (without .txt): ")
 
 		load(name)
 
