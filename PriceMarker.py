@@ -28,7 +28,7 @@ def userLinks():
 
 	for i in range(linkAmount):
 		url = input("Entre Amazon item URL (page of item you wanna track): ")
-		links = url.rsplit("/", 1)[0]
+		links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght 
 		lstLink.append(links)
 
 		userName = input("Entre name of Item: ")
@@ -45,11 +45,15 @@ def getPriceURL(lst):
 
 		if str(page.status_code) != "200":
 			print("This wont work, its the {0} URL you have entreed".format(i))
-			main()
+			main() # If page not found
 
 		soup = BeautifulSoup(page.content, 'html.parser')
 
-		price = soup.find_all("span",id="priceblock_ourprice")[0].get_text() # Will have to change this for all type of ID types FUCK AMAZON!
+		try:
+			price = soup.find_all("span",id="priceblock_ourprice")[0].get_text()
+		except IndexError:
+			price = soup.find_all("span",id="priceblock_saleprice")[0].get_text()
+
 
 		priceLst.append(float(price[1:]))
 
@@ -70,13 +74,16 @@ def drawGraph(pricelst,lst):
 	x = np.array(lst)
 	y = np.array(pricelst)
 
-	for i in y:
-		print(x,i)
-		if (i == y[-1]).all():
-			plt.plot(x,i, "b")
-		else:
-			plt.plot(x,i, "r.")
+	if len(y) <= 2:
+		plt.plot(x,y, "b")
+	else:
+		for i in y:
+			if (i == y[-1]).all():
+				plt.plot(x,i, "b")
+			else:
+				plt.plot(x,i, "r.")
 	plt.draw()
+
 	while True:
 		if plt.waitforbuttonpress():
 			break
@@ -84,6 +91,7 @@ def drawGraph(pricelst,lst):
 
 def storeGraph(links,price,fileName,name):
 	file = open(fileName+".txt","x") # For error Handling (if error go back to menu)
+	# If error do return
 
 	for i in links:
 		file.write(i+" ")
@@ -103,22 +111,21 @@ def load(name):
 	allPrices = []
 	graphName = []
 	link = []
-
 	index = 0
-	# Get all info 1) Links to find new prices 2) get name always stored on line 2 3) line 3 onwards are all the price from old on top to new at the very bottom
+
+	# Get all info   
 	for line in file:
 		tempPrice = []
 		index += 1
 
-		if index == 1:
+		if index == 1:# 1) Links to find new prices
 			for word in line.split():
 				link.append(word)
-				# newPrice = getPriceURL(link)
-				newPrice = [243.0, 439.99]
-		elif index == 2:
+				newPrice = getPriceURL(link)
+		elif index == 2:# 2) get name always stored on line 2
 			for word in line.split():
 				graphName.append(word)
-		else:
+		else:# 3) line 3 onwards are all the price from old on top to new at the very bottom
 			for word in line.split():
 				tempPrice.append(word)
 			allPrices.append(tempPrice)
@@ -163,7 +170,8 @@ def main():
 		priceLst = getPriceURL(linkLst)
 
 		storeGraph(linkLst,priceLst,fileName,itemNames)
-		drawGraph(priceLst,itemNames)# See if this still works??!
+		drawGraph(priceLst,itemNames)
+		main()
 
 	elif index == 2:
 		for i in os.listdir():
@@ -172,6 +180,7 @@ def main():
 		name = input("Entre name of graph (without .txt): ")
 
 		load(name)
+		main()
 
 
 	elif index == 3:
@@ -181,5 +190,6 @@ def main():
 
 		name = input("Entre name of graph (without .txt): ")
 		delete(name)
+		main()
 
 main()
