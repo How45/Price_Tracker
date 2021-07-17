@@ -43,9 +43,9 @@ def getPriceURL(lst):
 	for i in lst:
 		page = requests.get(i, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'})
 
-		if str(page.status_code) != "200":
+		if str(page.status_code) != "200": # If page not found
 			print("This wont work, its the {0} URL you have entreed".format(i))
-			main() # If page not found
+			main()
 
 		soup = BeautifulSoup(page.content, 'html.parser')
 
@@ -57,31 +57,38 @@ def getPriceURL(lst):
 
 		priceLst.append(float(price[1:]))
 
-		# Remove this V no need for title, use can create its own title
-
-		# title = soup.find_all("span",id="productTitle")[0].get_text()
-		# title = title.replace("\n","")
-
-		# if len(title) > 18:
-		# 	titlelst.append(title[:19])
-		# else:
-		# 	titlelst.append(title)
-
 	return priceLst
 
+def listChange(pricelst):
+	tempPrice = []
+	index = 0
+	for j in range(len(pricelst[0])):
+		temp = [] 
+		for i in pricelst:
+			for k in i:
+				if k == i[index]:
+					temp.append(k)
+					break
+		tempPrice.append(temp)
+		index += 1
+
+	pricelst = tempPrice
+	return pricelst
 
 def drawGraph(pricelst,lst):
-	x = np.array(lst)
+	tst = [0,1,2,3,4,5]
+	cl = ["--b.","--r.","--g."]
+
+	try:
+		pricelst = listChange(pricelst)
+	except TypeError:
+		print("Single lst")
+		
+	x = np.array(lst) 
 	y = np.array(pricelst)
 
-	if len(y) <= 2:
-		plt.plot(x,y, "b")
-	else:
-		for i in y:
-			if (i == y[-1]).all():
-				plt.plot(x,i, "b")
-			else:
-				plt.plot(x,i, "r.")
+	for i in range(len(pricelst)):
+		plt.plot(tst,y[i],cl[i], label = 'i')
 	plt.draw()
 
 	while True:
@@ -118,14 +125,14 @@ def load(name):
 		tempPrice = []
 		index += 1
 
-		if index == 1:# 1) Links to find new prices
+		if index == 1:# Links to find new prices
 			for word in line.split():
 				link.append(word)
 				newPrice = getPriceURL(link)
-		elif index == 2:# 2) get name always stored on line 2
+		elif index == 2:# get name always stored on line 2
 			for word in line.split():
 				graphName.append(word)
-		else:# 3) line 3 onwards are all the price from old on top to new at the very bottom
+		else:# line 3 onwards are all the price from old on top to new at the very bottom
 			for word in line.split():
 				tempPrice.append(word)
 			allPrices.append(tempPrice)
@@ -171,7 +178,6 @@ def main():
 
 		storeGraph(linkLst,priceLst,fileName,itemNames)
 		drawGraph(priceLst,itemNames)
-		main()
 
 	elif index == 2:
 		for i in os.listdir():
@@ -180,7 +186,6 @@ def main():
 		name = input("Entre name of graph (without .txt): ")
 
 		load(name)
-		main()
 
 
 	elif index == 3:
@@ -190,6 +195,6 @@ def main():
 
 		name = input("Entre name of graph (without .txt): ")
 		delete(name)
-		main()
 
 main()
+# Note - Fix name space
