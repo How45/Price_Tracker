@@ -3,7 +3,7 @@ import requests
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-
+import datetime
 
 def GUI():
 	print("""
@@ -24,7 +24,7 @@ def userLinks():
 	titlelst = []
 
 	fileName = input("Entre name of graph: ")
-	linkAmount = int(input("Entre amount of items you wanna be tracked: "))
+	linkAmount = int(input("Entre amount of items you wanna be tracked (max. 7): "))
 
 	for i in range(linkAmount):
 		url = input("Entre Amazon item URL (page of item you wanna track): ")
@@ -57,7 +57,10 @@ def getPriceURL(lst):
 
 		priceLst.append(float(price[1:]))
 
-	return priceLst
+		getDate = datetime.datetime.now()
+		date = getDate.strftime("%x")
+
+	return priceLst,date
 
 def listChange(pricelst):
 	tempPrice = []
@@ -75,28 +78,27 @@ def listChange(pricelst):
 	pricelst = tempPrice
 	return pricelst
 
-def drawGraph(pricelst,lst):
-	tst = [0,1,2,3,4,5]
-	cl = ["--b.","--r.","--g."]
+def drawGraph(pricelst,lst,date):
+	cl = ["--b.","--r.","--g.","--c.","--m.","--y.","--k."]
 
 	try:
 		pricelst = listChange(pricelst)
 	except TypeError:
 		print("Single lst")
 		
-	x = np.array(lst) 
+	x = np.array(date)
 	y = np.array(pricelst)
 
 	for i in range(len(pricelst)):
-		plt.plot(tst,y[i],cl[i], label = 'i')
-	plt.draw()
+		plt.plot(date,y[i],cl[i], label=lst[i])
+	plt.legend()
 
 	while True:
 		if plt.waitforbuttonpress():
 			break
 	plt.close()
 
-def storeGraph(links,price,fileName,name):
+def storeGraph(links,price,fileName,name,date):
 	file = open(fileName+".txt","x") # For error Handling (if error go back to menu)
 	# If error do return
 
@@ -110,6 +112,7 @@ def storeGraph(links,price,fileName,name):
 
 	for i in price:
 		file.write(str(i)+" ")
+	file.write(date)
 	file.close()
 
 def load(name):
@@ -118,6 +121,7 @@ def load(name):
 	allPrices = []
 	graphName = []
 	link = []
+	date = []
 	index = 0
 
 	# Get all info   
@@ -128,14 +132,19 @@ def load(name):
 		if index == 1:# Links to find new prices
 			for word in line.split():
 				link.append(word)
-				newPrice = getPriceURL(link)
+				newPrice,newDate = getPriceURL(link)
+
 		elif index == 2:# get name always stored on line 2
 			for word in line.split():
 				graphName.append(word)
+
 		else:# line 3 onwards are all the price from old on top to new at the very bottom
 			for word in line.split():
 				tempPrice.append(word)
+			date.append(tempPrice[-1])
+			tempPrice.remove(tempPrice[-1])
 			allPrices.append(tempPrice)
+
 	file.close()
 
 	# Check if there is any new prices (V this for loop changes prices on file into float)
@@ -146,7 +155,7 @@ def load(name):
 	# If statment sees if the newPrice found online is still the same as the most recent price on the file
 	if newPrice == allPrices[-1]:
 		print("Drawing")
-		drawGraph(allPrices,graphName)
+		drawGraph(allPrices,graphName,date)
 
 	else:
 		file = open(name+".txt","a")
@@ -159,6 +168,7 @@ def load(name):
 		file.write("\n")
 		for i in storePrice:
 			file.write(i+" ")
+		file.write(newDate)
 		file.close()
 		load(name)
 
@@ -174,10 +184,10 @@ def main():
 	if 	index == 1:
 
 		linkLst, itemNames, fileName = userLinks()
-		priceLst = getPriceURL(linkLst)
+		priceLst, date = getPriceURL(linkLst)
 
-		storeGraph(linkLst,priceLst,fileName,itemNames)
-		drawGraph(priceLst,itemNames)
+		storeGraph(linkLst,priceLst,fileName,itemNames,date)
+		drawGraph(priceLst,itemNames,date)
 
 	elif index == 2:
 		for i in os.listdir():
@@ -197,4 +207,4 @@ def main():
 		delete(name)
 
 main()
-# Note - Fix name space
+# Note - Fix name space, when someone adds a space between names replace that with a dash 
