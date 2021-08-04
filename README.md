@@ -3,6 +3,6 @@ This a program that allows users to entre a web link (e.g. a Amazon link) that c
 
 At the moment:
 
-- Works for some Amazon Links
 - Works only for Amazon
-- It cannot load / store
+- It can load / store
+- Shows all old prices if there is a price change
