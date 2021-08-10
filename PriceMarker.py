@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import datetime
+import csv 
 
 def GUI():
 	print("""
@@ -28,7 +29,7 @@ def userLinks():
 
 	for i in range(linkAmount):
 		url = input("Entre Amazon item URL (page of item you wanna track): ")
-		links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght 
+		links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght (NEED TO DO A CHECK IF ITS ALREADY SHORT)
 		lstLink.append(links)
 
 		userName = input("Entre name of Item: ")
@@ -38,7 +39,6 @@ def userLinks():
 
 def getPriceURL(lst):
 	priceLst = []
-	titlelst = []
 
 	for i in lst:
 		page = requests.get(i, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'})
@@ -53,21 +53,21 @@ def getPriceURL(lst):
 			price = soup.find_all("span",id="priceblock_ourprice")[0].get_text()
 		except IndexError:
 			price = soup.find_all("span",id="priceblock_saleprice")[0].get_text()
-
-
+			# price = soup.find_all("span",id="priceblock_dealprice")[0].get_text()
+			
 		priceLst.append(float(price[1:]))
 
 		getDate = datetime.datetime.now()
-		date = getDate.strftime("%x")
+		dates = getDate.strftime("%x")
 
-	return priceLst,date
+	return priceLst,dates
 
-def listChange(pricelst):
+def listChange(priceLsts):
 	tempPrice = []
 	index = 0
-	for j in range(len(pricelst[0])):
+	for j in range(len(priceLsts[0])):
 		temp = [] 
-		for i in pricelst:
+		for i in priceLsts:
 			for k in i:
 				if k == i[index]:
 					temp.append(k)
@@ -75,21 +75,21 @@ def listChange(pricelst):
 		tempPrice.append(temp)
 		index += 1
 
-	pricelst = tempPrice
-	return pricelst
+	priceLsts = tempPrice
+	return priceLsts
 
-def drawGraph(pricelst,lst,date):
+def drawGraph(lstPrice,lst,date):
 	cl = ["--b.","--r.","--g.","--c.","--m.","--y.","--k."]
 
 	try:
-		pricelst = listChange(pricelst)
+		lstPrice = listChange(lstPrice)
 	except TypeError:
 		print("Single lst")
 		
 	x = np.array(date)
-	y = np.array(pricelst)
+	y = np.array(lstPrice)
 
-	for i in range(len(pricelst)):
+	for i in range(len(lstPrice)):
 		plt.plot(date,y[i],cl[i], label=lst[i])
 	plt.legend()
 
@@ -98,25 +98,22 @@ def drawGraph(pricelst,lst,date):
 			break
 	plt.close()
 
-def storeGraph(links,price,fileName,name,date):
-	file = open(fileName+".txt","x") # For error Handling (if error go back to menu)
+def storeGraph(userLinks,price,filesName,name,date):
+	priceDate = price.copy()
+	priceDate.append(date)
+
+	file = open(filesName+".csv","x",newline='') # For error Handling (if error go back to menu)
 	# If error do return
+	writer = csv.writer(file)
 
-	for i in links:
-		file.write(i+" ")
-	file.write("\n")
-
-	for i in name:
-		file.write(i+" ")
-	file.write("\n")
-
-	for i in price:
-		file.write(str(i)+" ")
-	file.write(date)
+	writer.writerow(userLinks)
+	writer.writerow(name)
+	writer.writerow(priceDate)
 	file.close()
 
 def load(name):
-	file = open(name+".txt","r")
+	file = open(name+".csv","r")
+	reader = csv.reader(file)
 
 	allPrices = []
 	graphName = []
@@ -125,31 +122,31 @@ def load(name):
 	index = 0
 
 	# Get all info   
-	for line in file:
+	for line in reader:
 		tempPrice = []
 		index += 1
 
-		if index == 1:# Links to find new prices
-			for word in line.split():
-				link.append(word)
-				newPrice,newDate = getPriceURL(link)
+		if index == 1: # Links to find new prices
+			link = line.copy()
+			link.remove(link[-1])
+
+			newPrice, newDate = getPriceURL(link)
 
 		elif index == 2:# get name always stored on line 2
-			for word in line.split():
-				graphName.append(word)
+			graphName = line.copy()
+			graphName.remove(graphName[-1])
 
 		else:# line 3 onwards are all the price from old on top to new at the very bottom
-			for word in line.split():
-				tempPrice.append(word)
+			tempPrice = line.copy()
+
 			date.append(tempPrice[-1])
 			tempPrice.remove(tempPrice[-1])
 			allPrices.append(tempPrice)
-
+				
 	file.close()
 
-	# Check if there is any new prices (V this for loop changes prices on file into float)
-	for i in range(0,len(allPrices)):
-		for k in range(0,len(allPrices[i])):
+	for i in range(len(allPrices)):
+		for k in range(len(allPrices[i])):
 			allPrices[i][k] = float(allPrices[i][k])
 
 	# If statment sees if the newPrice found online is still the same as the most recent price on the file
@@ -158,24 +155,21 @@ def load(name):
 		drawGraph(allPrices,graphName,date)
 
 	else:
-		file = open(name+".txt","a")
+		file = open(name+".csv","a")
+		writer = csv.writer(file)
+
 		print("add newPrice to all price, also update the file")
+		storePrice = newPrice.copy() # Changes name as it becomes new price
+		storePrice.append(newDate)
 
-		storePrice = newPrice
-		for i in range(0,len(storePrice)):
-			storePrice[i] = str(storePrice[i])
-
-		file.write("\n")
-		for i in storePrice:
-			file.write(i+" ")
-		file.write(newDate)
+		writer.writerow(storePrice)
 		file.close()
 		load(name)
 
 
 def delete(name):
-	if os.path.exists(name+".txt"):
-		os.remove(name+".txt")
+	if os.path.exists(name+".csv"):
+		os.remove(name+".csv")
 		print("Deleted "+name)
 
 def main():
@@ -191,19 +185,19 @@ def main():
 
 	elif index == 2:
 		for i in os.listdir():
-			if i.endswith(".txt"):
+			if i.endswith(".csv"):
 				print(i)
-		name = input("Entre name of graph (without .txt): ")
+		name = input("Entre name of graph (without .csv): ")
 
 		load(name)
 
 
 	elif index == 3:
 		for i in os.listdir():
-			if i.endswith(".txt"):
+			if i.endswith(".csv"):
 				print(i)
 
-		name = input("Entre name of graph (without .txt): ")
+		name = input("Entre name of graph (without .csv): ")
 		delete(name)
 
 main()
