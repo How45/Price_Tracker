@@ -24,15 +24,15 @@ def userLinks():
 	lstLink = []
 	titlelst = []
 
-	fileName = input("Entre name of graph: ")
-	linkAmount = int(input("Entre amount of items you wanna be tracked (max. 7): "))
+	fileName = input("Enter name of graph: ")
+	linkAmount = int(input("Enter amount of items you wanna be tracked (max. 7): "))
 
 	for i in range(linkAmount):
-		url = input("Entre Amazon item URL (page of item you wanna track): ")
+		url = input("Enter Amazon item URL (page of item you wanna track): ")
 		links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght (NEED TO DO A CHECK IF ITS ALREADY SHORT)
 		lstLink.append(links)
 
-		userName = input("Entre name of Item: ")
+		userName = input("Enter name of Item: ")
 		titlelst.append(userName)
 
 	return lstLink,titlelst,fileName
@@ -44,16 +44,19 @@ def getPriceURL(lst):
 		page = requests.get(i, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'})
 
 		if str(page.status_code) != "200": # If page not found
-			print("This wont work, its the {0} URL you have entreed".format(i))
+			print("This wont work, its the {0} URL you have entered".format(i))
 			main()
 
 		soup = BeautifulSoup(page.content, 'html.parser')
 
-		try:
+		if soup.find_all("span",id="priceblock_ourprice")[0].get_text() != None:
 			price = soup.find_all("span",id="priceblock_ourprice")[0].get_text()
-		except IndexError:
+
+		elif soup.find_all("span",id="priceblock_saleprice")[0].get_text() != None:
 			price = soup.find_all("span",id="priceblock_saleprice")[0].get_text()
-			# price = soup.find_all("span",id="priceblock_dealprice")[0].get_text()
+
+		else:
+			price = soup.find_all("span",id="priceblock_dealprice")[0].get_text()
 			
 		priceLst.append(float(price[1:]))
 
@@ -128,13 +131,10 @@ def load(name):
 
 		if index == 1: # Links to find new prices
 			link = line.copy()
-			link.remove(link[-1])
-
 			newPrice, newDate = getPriceURL(link)
 
 		elif index == 2:# get name always stored on line 2
 			graphName = line.copy()
-			graphName.remove(graphName[-1])
 
 		else:# line 3 onwards are all the price from old on top to new at the very bottom
 			tempPrice = line.copy()
@@ -145,6 +145,7 @@ def load(name):
 				
 	file.close()
 
+	# Converst prices from str to float
 	for i in range(len(allPrices)):
 		for k in range(len(allPrices[i])):
 			allPrices[i][k] = float(allPrices[i][k])
@@ -187,7 +188,7 @@ def main():
 		for i in os.listdir():
 			if i.endswith(".csv"):
 				print(i)
-		name = input("Entre name of graph (without .csv): ")
+		name = input("Enter name of graph (without .csv): ")
 
 		load(name)
 
@@ -196,8 +197,7 @@ def main():
 		for i in os.listdir():
 			if i.endswith(".csv"):
 				print(i)
-
-		name = input("Entre name of graph (without .csv): ")
+		name = input("Enter name of graph (without .csv): ")
 		delete(name)
 
 main()
