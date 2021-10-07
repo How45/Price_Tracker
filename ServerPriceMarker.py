@@ -23,8 +23,14 @@ def getPriceURL(lst):
 		elif soup.find_all("span",id="priceblock_saleprice")[0].get_text() != None:
 			price = soup.find_all("span",id="priceblock_saleprice")[0].get_text()
 
+		elif soup.find_all("span",id="priceblock_dealprice")[0].get_text() != None:
+			price = soup.find_all("span",id="priceblock_dealprice").get_text()
+
+		elif soup.find_all("span",class_="a-size-base a-color-price")[0].get_text() != None:
+			price = soup.find_all("span",class_="a-size-base a-color-price")[0].get_text()
+
 		else:
-			price = soup.find_all("span",id="priceblock_dealprice")[0].get_text()
+			print("New ID")
 			
 		priceLst.append(float(price[1:]))
 
