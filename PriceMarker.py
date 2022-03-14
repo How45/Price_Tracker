@@ -48,21 +48,30 @@ def getPriceURL(lst):
 			main()
 
 		soup = BeautifulSoup(page.content, 'html.parser')
+		
+		try: 
+			if soup.find("span",id="priceblock_ourprice").get_text() != None:
+				price = soup.find("span",id="priceblock_ourprice").get_text()
+		except:
+			pass
 
-		if soup.find_all("span",id="priceblock_ourprice")[0].get_text() != None:
-			price = soup.find_all("span",id="priceblock_ourprice")[0].get_text()
+		try:
+			if soup.find("span",id="priceblock_saleprice").get_text() != None:
+				price = soup.find("span",id="priceblock_saleprice").get_text()
+		except:
+			pass
+		try:
+			if soup.find("span",id="priceblock_dealprice").get_text() != None:
+				price = soup.find("span",id="priceblock_dealprice").get_text()
+		except:
+			pass
 
-		elif soup.find_all("span",id="priceblock_saleprice")[0].get_text() != None:
-			price = soup.find_all("span",id="priceblock_saleprice")[0].get_text()
+		price = soup.find("span",class_="a-price-whole").get_text()
 
-		else:
-			price = soup.find_all("span",id="priceblock_dealprice")[0].get_text()
-			
-		priceLst.append(float(price[1:]))
-
+		priceLst.append(float(price[0:]))
+		
 		getDate = datetime.datetime.now()
 		dates = getDate.strftime("%x")
-
 	return priceLst,dates
 
 def listChange(priceLsts):
