@@ -19,33 +19,37 @@ def getPriceURL(lst):
         soup = BeautifulSoup(page.content, 'html.parser')
         
         try: 
-            if soup.find("span",id="priceblock_ourprice").get_text() != None:
-                price = soup.find("span",id="priceblock_ourprice").get_text()
-        except:
-            pass
-
-        try:
-            if soup.find("span",id="priceblock_saleprice").get_text() != None:
-                price = soup.find("span",id="priceblock_saleprice").get_text()
+            price = soup.find("span",id="priceblock_ourprice").get_text()
         except:
             pass
         try:
-            if soup.find("span",id="priceblock_dealprice").get_text() != None:
-                price = soup.find("span",id="priceblock_dealprice").get_text()
+            price = soup.find("span",id="priceblock_saleprice").get_text()
         except:
             pass
-
-        price = soup.find("span",class_="a-price-whole").get_text()
-
-        priceLst.append(float(price[0:]))
+        try:
+            price = soup.find("span",id="priceblock_dealprice").get_text()
+        except:
+            pass
+        try:
+            price = soup.find("span",class_="a-price-whole").get_text()
+        except:
+            pass
+        try:
+            price = soup.find("span",class_="a-offscreen").get_text()
+        except:
+            print("This link doesnt match any of thses")
         
-        getDate = datetime.datetime.now()
-        dates = getDate.strftime("%x")
-    print(priceLst)
+        # check if there is a £ or not
+        if price[0] == "£":
+            priceLst.append(float(price[1:]))
+        else:
+            priceLst.append(float(price[0:]))
+
+        dates = datetime.datetime.now().replace(microsecond=0).strftime("%x")
     return priceLst,dates
 
 def main():
-    linkLst = ["https://www.amazon.co.uk/TeckNet-Wireless-Keyboard-keyboard-Whisper-Quiet/dp/B00M75WPKO/ref=sr_1_14?crid=E39FAEH8J98G&keywords=keyboards&qid=1647269775&s=computers&sprefix=keyboards%2Ccomputers%2C152&sr=1-14"]
+    linkLst = ["https://www.amazon.co.uk/TCL-43P617K-Android-Freeview-Bluetooth/dp/B098WSJXXW"]
     # priceLst, date = 
     getPriceURL(linkLst)
 main()

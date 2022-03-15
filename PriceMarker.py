@@ -50,28 +50,33 @@ def getPriceURL(lst):
 		soup = BeautifulSoup(page.content, 'html.parser')
 		
 		try: 
-			if soup.find("span",id="priceblock_ourprice").get_text() != None:
-				price = soup.find("span",id="priceblock_ourprice").get_text()
-		except:
-			pass
-
-		try:
-			if soup.find("span",id="priceblock_saleprice").get_text() != None:
-				price = soup.find("span",id="priceblock_saleprice").get_text()
+			price = soup.find("span",id="priceblock_ourprice").get_text()
 		except:
 			pass
 		try:
-			if soup.find("span",id="priceblock_dealprice").get_text() != None:
-				price = soup.find("span",id="priceblock_dealprice").get_text()
+			price = soup.find("span",id="priceblock_saleprice").get_text()
 		except:
 			pass
+		try:
+			price = soup.find("span",id="priceblock_dealprice").get_text()
+		except:
+			pass
+		try:
+			price = soup.find("span",class_="a-price-whole").get_text()
+		except:
+			pass
+		try:
+			price = soup.find("span",class_="a-offscreen").get_text()
+		except:
+			print("This link doesnt match any of thses")
 
-		price = soup.find("span",class_="a-price-whole").get_text()
-
-		priceLst.append(float(price[0:]))
+		# check if there is a £ or not
+		if price[0] == "£":
+			priceLst.append(float(price[1:]))
+		else:
+			priceLst.append(float(price[0:]))
 		
-		getDate = datetime.datetime.now()
-		dates = getDate.strftime("%x")
+		dates = datetime.datetime.now().strftime('%d/%m/%Y')
 	return priceLst,dates
 
 def listChange(priceLsts):
@@ -146,11 +151,11 @@ def load(name):
 			graphName = line.copy()
 
 		else:# line 3 onwards are all the price from old on top to new at the very bottom
-			tempPrice = line.copy()
+			tempPrice = line.copy() # price,price,...,date
 
-			date.append(tempPrice[-1])
-			tempPrice.remove(tempPrice[-1])
-			allPrices.append(tempPrice)
+			date.append(tempPrice[-1]) # Gets the date 
+			tempPrice.remove(tempPrice[-1]) # removes the date
+			allPrices.append(tempPrice) # prices 
 				
 	file.close()
 
@@ -165,17 +170,15 @@ def load(name):
 		drawGraph(allPrices,graphName,date)
 
 	else:
-		file = open(name+".csv","a")
+		file = open(name+".csv","a",newline='')
 		writer = csv.writer(file)
 
 		print("add newPrice to all price, also update the file")
-		storePrice = newPrice.copy() # Changes name as it becomes new price
-		storePrice.append(newDate)
-
-		writer.writerow(storePrice)
+		newPrice.append(newDate)
+		writer.writerow(newPrice)
 		file.close()
-		load(name)
 
+		load(name)
 
 def delete(name):
 	if os.path.exists(name+".csv"):

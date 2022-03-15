@@ -1,0 +1,2 @@
+"span",class="a-price-whole"
+"span",class_="a-offscreen"
