@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import datetime
-import csv 
+import csv
+import websitePrice as web
 
 def GUI():
 	print("""
@@ -49,26 +50,7 @@ def getPriceURL(lst):
 
 		soup = BeautifulSoup(page.content, 'html.parser')
 		
-		try: 
-			price = soup.find("span",id="priceblock_ourprice").get_text()
-		except:
-			pass
-		try:
-			price = soup.find("span",id="priceblock_saleprice").get_text()
-		except:
-			pass
-		try:
-			price = soup.find("span",id="priceblock_dealprice").get_text()
-		except:
-			pass
-		try:
-			price = soup.find("span",class_="a-price-whole").get_text()
-		except:
-			pass
-		try:
-			price = soup.find("span",class_="a-offscreen").get_text()
-		except:
-			print("This link doesnt match any of thses")
+		price = web.webPrice(soup)
 
 		# check if there is a £ or not
 		if price[0] == "£":

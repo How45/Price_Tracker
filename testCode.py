@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import datetime
-import csv 
+import csv
+import websitePrice as web
 
 def getPriceURL(lst):
     priceLst = []
@@ -17,39 +18,23 @@ def getPriceURL(lst):
             main()
 
         soup = BeautifulSoup(page.content, 'html.parser')
-        
-        try: 
-            price = soup.find("span",id="priceblock_ourprice").get_text()
-        except:
-            pass
-        try:
-            price = soup.find("span",id="priceblock_saleprice").get_text()
-        except:
-            pass
-        try:
-            price = soup.find("span",id="priceblock_dealprice").get_text()
-        except:
-            pass
-        try:
-            price = soup.find("span",class_="a-price-whole").get_text()
-        except:
-            pass
-        try:
-            price = soup.find("span",class_="a-offscreen").get_text()
-        except:
-            print("This link doesnt match any of thses")
+
+        div_elm = soup.find("div",class_="a-section a-spacing-none aok-align-center")
+        print(div_elm)
+        price = "£-1"
+       # price = web.webPrice(soup)
         
         # check if there is a £ or not
         if price[0] == "£":
             priceLst.append(float(price[1:]))
         else:
             priceLst.append(float(price[0:]))
-
-        dates = datetime.datetime.now().replace(microsecond=0).strftime("%x")
+        
+        dates = datetime.datetime.now().strftime('%d/%m/%Y')
     return priceLst,dates
 
 def main():
-    linkLst = ["https://www.amazon.co.uk/TCL-43P617K-Android-Freeview-Bluetooth/dp/B098WSJXXW"]
+    linkLst = ["https://www.amazon.co.uk/OUKEYI-Stuffed-Animal-Plushies-Pillows/dp/B08PT88YNP"]
     # priceLst, date = 
     getPriceURL(linkLst)
 main()
