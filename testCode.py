@@ -11,18 +11,15 @@ def getPriceURL(lst):
     priceLst = []
 
     for i in lst:
-        page = requests.get(i, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'})
-
+        HEADER = ({'User-Agent':'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/44.0.2403.157 Safari/537.36','Accept-Language': 'en-US, en;q=0.5'})
+        page = requests.get(i, headers=HEADER)
         if str(page.status_code) != "200": # If page not found
             print("This wont work, its the {0} URL you have entered".format(i))
             main()
 
-        soup = BeautifulSoup(page.content, 'html.parser')
-
-        div_elm = soup.find("div",class_="a-section a-spacing-none aok-align-center")
-        print(div_elm)
-        price = "£-1"
-       # price = web.webPrice(soup)
+        soup = BeautifulSoup(page.content, "lxml")
+        print(soup)
+        price = web.webPrice(soup) # Finding price 
         
         # check if there is a £ or not
         if price[0] == "£":
@@ -34,7 +31,7 @@ def getPriceURL(lst):
     return priceLst,dates
 
 def main():
-    linkLst = ["https://www.amazon.co.uk/OUKEYI-Stuffed-Animal-Plushies-Pillows/dp/B08PT88YNP"]
+    linkLst = ["https://www.amazon.co.uk/TCL-43P617K-Android-Freeview-Bluetooth/dp/B098WSJXXW"]
     # priceLst, date = 
     getPriceURL(linkLst)
-main()
+main()  

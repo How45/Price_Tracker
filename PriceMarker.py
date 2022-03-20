@@ -30,8 +30,13 @@ def userLinks():
 
 	for i in range(linkAmount):
 		url = input("Enter Amazon item URL (page of item you wanna track): ")
-		links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght (NEED TO DO A CHECK IF ITS ALREADY SHORT)
-		lstLink.append(links)
+		
+		if url[12] == "a":
+			links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght (NEED TO DO A CHECK IF ITS ALREADY SHORT)
+			lstLink.append(links)
+		else:
+			lstLink.append(url)
+		
 
 		userName = input("Enter name of Item: ")
 		titlelst.append(userName)
