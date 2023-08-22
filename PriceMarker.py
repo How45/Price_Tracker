@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 import datetime
-import csv 
+import csv
+import websitePrice as web
 
 def GUI():
 	print("""
@@ -29,8 +30,13 @@ def userLinks():
 
 	for i in range(linkAmount):
 		url = input("Enter Amazon item URL (page of item you wanna track): ")
-		links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght (NEED TO DO A CHECK IF ITS ALREADY SHORT)
-		lstLink.append(links)
+		
+		if url[12] == "a":
+			links = url.rsplit("/", 1)[0] # Removes unnecessary extra link lenght (NEED TO DO A CHECK IF ITS ALREADY SHORT)
+			lstLink.append(links)
+		else:
+			lstLink.append(url)
+		
 
 		userName = input("Enter name of Item: ")
 		titlelst.append(userName)
@@ -48,21 +54,14 @@ def getPriceURL(lst):
 			main()
 
 		soup = BeautifulSoup(page.content, 'html.parser')
-
-		if soup.find_all("span",id="priceblock_ourprice")[0].get_text() != None:
-			price = soup.find_all("span",id="priceblock_ourprice")[0].get_text()
+		
+		price = web.webPrice(soup)
 
 		elif soup.find_all("span",id="priceblock_saleprice")[0].get_text() != None:
 			price = soup.find_all("span",id="priceblock_saleprice")[0].get_text()
 
-		elif soup.find_all("span",id="priceblock_dealprice")[0].get_text() != None:
-			price = soup.find_all("span",id="priceblock_dealprice").get_text()
-
-		elif soup.find_all("span",class_="a-size-base a-color-price")[0].get_text() != None:
-			price = soup.find_all("span",class_="a-size-base a-color-price")[0].get_text()
-
 		else:
-			print("There is an ID you need to add")
+			price = soup.find_all("span",id="priceblock_dealprice")[0].get_text()
 			
 		priceLst.append(float(price[1:]))
 
@@ -143,11 +142,11 @@ def load(name):
 			graphName = line.copy()
 
 		else:# line 3 onwards are all the price from old on top to new at the very bottom
-			tempPrice = line.copy()
+			tempPrice = line.copy() # price,price,...,date
 
-			date.append(tempPrice[-1])
-			tempPrice.remove(tempPrice[-1])
-			allPrices.append(tempPrice)
+			date.append(tempPrice[-1]) # Gets the date 
+			tempPrice.remove(tempPrice[-1]) # removes the date
+			allPrices.append(tempPrice) # prices 
 				
 	file.close()
 
@@ -162,17 +161,15 @@ def load(name):
 		drawGraph(allPrices,graphName,date)
 
 	else:
-		file = open(name+".csv","a")
+		file = open(name+".csv","a",newline='')
 		writer = csv.writer(file)
 
 		print("add newPrice to all price, also update the file")
-		storePrice = newPrice.copy() # Changes name as it becomes new price
-		storePrice.append(newDate)
-
-		writer.writerow(storePrice)
+		newPrice.append(newDate)
+		writer.writerow(newPrice)
 		file.close()
-		load(name)
 
+		load(name)
 
 def delete(name):
 	if os.path.exists(name+".csv"):
