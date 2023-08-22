@@ -3,8 +3,8 @@ import requests
 import datetime
 import website_ids as web
 
-def get_price_url(lst):
-    priceLst = []
+def getPriceURL(lst):
+    price_list = []
     for i in lst:
         page = requests.get(i, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'})
 
@@ -16,9 +16,9 @@ def get_price_url(lst):
 
         # check if there is a £ or not
         if price[0] == "£":
-            priceLst.append(float(price[1:]))
+            price_list.append(float(price[1:]))
         else:
-            priceLst.append(float(price[0:]))
+            price_list.append(float(price[0:]))
 
         dates = datetime.datetime.now().strftime('%d/%m/%Y')
-    return priceLst,dates
+    return price_list,dates

@@ -21,11 +21,11 @@ def main():
 
     if 	index == 1:
 
-        linkLst, itemNames, fileName = hp.user_links()
-        priceLst, date = page.get_price_url(linkLst)
+        link_list, item_name, file_name = hp.user_links()
+        price_list, date = page.get_price_url(link_list)
 
-        hp.store_graph(linkLst,priceLst,fileName,itemNames,date)
-        hp.draw_graph(priceLst,itemNames,date)
+        hp.storeGraph(link_list,price_list,file_name,item_name,date)
+        hp.drawGraph(price_list,item_name,date)
 
     elif index == 2:
         for i in os.listdir():
