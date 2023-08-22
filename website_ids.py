@@ -1,4 +1,4 @@
-def webPrice(soup):
+def web_price(soup):
     try: 
         return soup.find("span",id="priceblock_ourprice").get_text()
     except:
