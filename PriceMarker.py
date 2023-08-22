@@ -62,7 +62,7 @@ def getPriceURL(lst):
 			price = soup.find_all("span",class_="a-size-base a-color-price")[0].get_text()
 
 		else:
-			print("New ID")
+			print("There is an ID you need to add")
 			
 		priceLst.append(float(price[1:]))
 
