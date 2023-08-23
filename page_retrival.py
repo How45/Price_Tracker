@@ -7,7 +7,7 @@ def get_prices(url_list):
     """Gets prices from page"""
     prices_list = []
     for url in url_list:
-        page = requests.get(url, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'},timeout='10')
+        page = requests.get(url, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'},timeout=10)
 
         if str(page.status_code) != '200': # If page not found
             print(f'This wont work, its the {url} URL you have entered')
@@ -22,4 +22,4 @@ def get_prices(url_list):
             prices_list.append(float(price[0:]))
 
         dates = datetime.datetime.now().strftime('%d/%m/%Y')
-    return prices_list,dates
+    return prices_list, dates

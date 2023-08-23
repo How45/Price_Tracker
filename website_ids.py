@@ -1,5 +1,5 @@
 def web_price(soup):
-    """All ids of the HTML page for Amazon and eBay"""
+    """All ids of the HTML page for Amazon and/or eBay"""
     identifiers = [
         'priceblock_ourprice',
         'priceblock_saleprice',

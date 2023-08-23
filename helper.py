@@ -1,5 +1,6 @@
 import csv
 import os
+import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import page_retrival as page
@@ -24,6 +25,7 @@ def draw_graph(price_list,lst,date):
         plt.plot(date,y_axis[i],colours[i], label=lst[i])
     plt.legend()
 
+    print('Press any key to close')
     while True:
         if plt.waitforbuttonpress():
             break
@@ -65,50 +67,52 @@ def load(name):
     file = open(f'following/{name}.csv','r',encoding='UTF-8')
     reader = csv.reader(file)
 
-    all_prices,graph_name,link,date = [],[],[],[]
+    all_prices, graph_name, url, item_date, new_price = [],[],[],[],None
     index = 0
 
     # Get all info
     for line in reader:
         price = []
         index += 1
-
         if index == 1: # Links to find new prices
-            link = line.copy()
-            new_price, new_date = page.get_prices(link)
+            url = line.copy()
 
         elif index == 2: # get name always stored on line 2
             graph_name = line.copy()
 
         else: # line 3 onwards are all the price from old on top to new at the very bottom
             price = line.copy()
-            print(price)
-            date.append(price[-1])
+            item_date.append(price[-1])
             price.remove(price[-1])
             all_prices.append(price)
 
     file.close()
 
+    # Doesn't need to retrieve data if date is in file
+    current_date = datetime.datetime.now().strftime('%d/%m/%Y')
+    if current_date not in item_date:
+        print('Retrieving new data')
+        new_price, new_date = page.get_prices(url)
+
     # Converst prices from str to float
-    for line in enumerate(all_prices):
-        for price in enumerate(all_prices[line]):
-            all_prices[line][price] = float(all_prices[line][price])
+    for line_index, line in enumerate(all_prices):
+        for price_index, price in enumerate(line):
+            all_prices[line_index][price_index] = float(price)
 
-    # If online price = to most recent price on the file
-    if new_price == all_prices[-1]:
+    # Checks new prices and if its in the prices are the same to file
+    if not new_price or new_price == all_prices[-1]:
         print("Drawing")
-        draw_graph(all_prices,graph_name,date)
+        draw_graph(all_prices, graph_name, item_date)
 
-    else: # REMOVE EXTRA LINE WHEN IT ADDS
-        file = open(f'following/{name}.csv','a',encoding='UTF-8')
-        writer = csv.writer(file)
+    else:
+        with open(f'following/{name}.csv', 'a', newline='', encoding='UTF-8') as file:
+            writer = csv.writer(file)
+            print("Adding new_price to all_prices and updating the file")
+            store_price = new_price.copy()  # Make a copy to avoid modifying new_price
+            store_price.append(new_date)
+            print(store_price)
+            writer.writerow(store_price)
 
-        print("add new_price to all price, also update the file")
-        store_price = new_price.copy() # Changes name as it becomes new price
-        store_price.append(new_date)
-
-        writer.writerow(store_price)
-        file.close()
         load(name)
 
 def delete(name):
