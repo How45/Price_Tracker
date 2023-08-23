@@ -1,26 +1,16 @@
 def web_price(soup):
-    try: 
-        return soup.find("span",id="priceblock_ourprice").get_text()
-    except:
-        pass
-    try:
-        return soup.find("span",id="priceblock_saleprice").get_text()
-    except:
-        pass
-    try:
-        return soup.find("span",id="priceblock_dealprice").get_text()
-    except:
-        pass
-    try:
-        return soup.find("span",class_="a-price-whole").get_text()
-    except:
-        pass
-    try:
-        return soup.find("span",class_="a-offscreen").get_text()
-    except:
-        pass
-    # Ebay
-    try:
-        return soup.find("span",id="prcIsum").get_text()
-    except:
-        return "£-1"
+    """All ids of the HTML page for Amazon and eBay"""
+    identifiers = [
+        'priceblock_ourprice',
+        'priceblock_saleprice',
+        'priceblock_dealprice',
+        'a-price-whole',
+        'a-offscreen',
+        'prcIsum'
+    ]
+
+    for identifier in identifiers:
+        price_element = soup.find('span', id=identifier, class_='a-price-whole' if identifier == 'a-offscreen' else None)
+        if price_element:
+            return price_element.get_text()
+    return '£-1'

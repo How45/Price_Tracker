@@ -2,7 +2,10 @@ import os
 import helper as hp
 import page_retrival as page
 
-def GUI():
+
+def graphic():
+    """UI graphic of page"""
+    # pylint: disable=anomalous-backslash-in-string
     print("""
          ___  ____   __   ____  _  _     ___  __   _  _  ____   __   ____  ____
         / __)(  _ \ / _\ (  _ \/ )( \   / __)/  \ ( \/ )(  _ \ / _\ (  _ \(  __)
@@ -17,31 +20,28 @@ def GUI():
     return user
 
 def main():
-    index = GUI()
+    """Control of all UI"""
+    index = graphic()
 
-    if 	index == 1:
+    if index == 1:
 
-        link_list, item_name, file_name = hp.user_links()
-        price_list, date = page.get_price_url(link_list)
+        link_list, item_name, file_name = hp.get_links()
+        price_list, date = page.get_prices(link_list)
 
-        hp.storeGraph(link_list,price_list,file_name,item_name,date)
-        hp.drawGraph(price_list,item_name,date)
+        hp.store_graph_data(link_list, price_list, file_name, item_name, date)
+        hp.draw_graph(price_list, item_name, date)
 
     elif index == 2:
-        for i in os.listdir():
-            if i.endswith(".csv"):
-                print(i)
+        print(os.listdir('following'))
         name = input("Enter name of graph (without .csv): ")
 
         hp.load(name)
-
-
     elif index == 3:
-        for i in os.listdir():
-            if i.endswith(".csv"):
-                print(i)
+        print(os.listdir('following'))
         name = input("Enter name of graph (without .csv): ")
         hp.delete(name)
+    else:
+        print('ERROR: No key')
 
 if __name__ == '__main__':
     main()
