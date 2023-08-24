@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5432,
+            "askForPassword": true,
+            "driver": "PostgreSQL",
+            "name": "PT_Database",
+            "database": "price_tracker",
+            "username": "Price_Tracker_Project"
+        }
+    ]
+}

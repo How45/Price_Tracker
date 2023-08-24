@@ -4,13 +4,20 @@ def web_price(soup):
         'priceblock_ourprice',
         'priceblock_saleprice',
         'priceblock_dealprice',
-        'a-price-whole',
-        'a-offscreen',
         'prcIsum'
     ]
+    class_identifiers=[
+        'a-price-whole',
+        'a-offscreen',
+    ]
 
-    for identifier in identifiers:
-        price_element = soup.find('span', id=identifier, class_='a-price-whole' if identifier == 'a-offscreen' else None)
+    for ids in identifiers:
+        price_element = soup.find('span', id=ids).get_text()
+        if price_element:
+            return price_element.get_text()
+
+    for classes in class_identifiers:
+        price_element = soup.find('span', class_=classes).get_text()
         if price_element:
             return price_element.get_text()
     return '£-1'

@@ -6,7 +6,7 @@ import numpy as np
 import page_retrival as page
 
 def list_change(price_list):
-    """Transposing the list so prices are in the same category."""
+    """Transposing the list so prices in the same catergory are in a list."""
     return [[i[index] for i in price_list] for index in range(len(price_list[0]))]
 
 def draw_graph(price_list,lst,date):
