@@ -11,13 +11,16 @@ def web_price(soup):  # All ids of the HTML page for Amazon and/or eBay
         'a-offscreen',
     ]
 
-    for ids in identifiers:
-        price_element = soup.find('span', id=ids).get_text()
-        if price_element:
-            return price_element.get_text()
-
-    for classes in class_identifiers:
-        price_element = soup.find('span', class_=classes).get_text()
-        if price_element:
-            return price_element.get_text()
+    try:
+        for ids in identifiers:
+            price_element = soup.find('span', id=ids)
+            print(ids)
+            if price_element:
+                return price_element.get_text()
+    except AttributeError:
+        for classes in class_identifiers:
+            price_element = soup.find('span', class_=classes)
+            print(classes)
+            if price_element:
+                return price_element.get_text()
     return '£-1'

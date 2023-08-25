@@ -4,14 +4,17 @@ import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import page_retrival as page
+import sql_commands as sql
 
-def list_change(price_list):
-    """Transposing the list so prices in the same catergory are in a list."""
+
+def list_change(price_list):  # PRODS DELETE
+    # Transposing the list so prices in the same catergory are in a list.
     return [[i[index] for i in price_list] for index in range(len(price_list[0]))]
 
-def draw_graph(price_list,lst,date):
-    """Draws graph"""
-    colours = ["--b.","--r.","--g.","--c.","--m.","--y.","--k."]
+
+def draw_graph(price_list, lst, date):
+    # Draws graph
+    colours = ["--b.", "--r.", "--g.", "--c.", "--m.", "--y.", "--k."]
 
     try:
         price_list = list_change(price_list)
@@ -22,7 +25,7 @@ def draw_graph(price_list,lst,date):
     y_axis = np.array(price_list)
 
     for i in range(len(price_list)):
-        plt.plot(date,y_axis[i],colours[i], label=lst[i])
+        plt.plot(date, y_axis[i], colours[i], label=lst[i])
     plt.legend()
 
     print('Press any key to close')
@@ -31,16 +34,17 @@ def draw_graph(price_list,lst,date):
             break
     plt.close()
 
+
 def get_links():
-    """gets links from user"""
+    # gets links from user
     link_list, title_list = [], []
 
     file_name = input("Enter name of graph: ")
-    linked_accounts = int(input("Enter amount of items you wanna be tracked (max. 7): "))
+    linked_accounts = int(input("Enter amount of items you wanna be tracked: "))
 
     for _ in range(linked_accounts):
         url = input("Enter Amazon item URL (page of item you wanna track): ")
-        links = url.rsplit("/", 1)[0] # Removes unnecessary link lenght
+        links = url.rsplit("/", 1)[0]  # Removes unnecessary link lenght
         # ^ (NEED TO DO A CHECK IF ITS ALREADY SHORT)
         link_list.append(links)
 
@@ -49,38 +53,37 @@ def get_links():
 
     return link_list, title_list, file_name
 
-def store_graph_data(user_links, price, file_name, name, date):
-    """Store Data for graph in CSV"""
-    price_date = price + [date]
 
-    try:
-        with open(f'following/{file_name}.csv','x', newline='',encoding='UTF-8') as file:
-            writer = csv.writer(file)
-            writer.writerow(user_links)
-            writer.writerow(name)
-            writer.writerow(price_date)
-    except FileExistsError:
-        print(f"Error: {file_name}.csv already exists. Returning to the menu.")
+def initialise_data_graph(links, prices, file_name, items, date):
+    # Store Data for graph in CSV
+    sql.add_following(file_name)
+
+    for price, item in zip(prices, items):
+        sql.add_items(file_name, item, price, date)
+
+    for item, link in zip(items, links):
+        sql.add_links(item, link)
+
 
 def load(name):
-    """gets data from folder and update if needed"""
-    file = open(f'following/{name}.csv','r',encoding='UTF-8')
+    # gets data from folder and update if needed
+    file = open(f'following/{name}.csv', 'r', encoding='UTF-8') # (CHANGE TO SQL STUFF)
     reader = csv.reader(file)
 
-    all_prices, graph_name, url, item_date, new_price = [],[],[],[],None
+    all_prices, graph_name, url, item_date, new_price = [], [], [], [], None
     index = 0
 
-    # Get all info
+    # Get all info (CHANGE TO SQL STUFF)
     for line in reader:
         price = []
         index += 1
-        if index == 1: # Links to find new prices
+        if index == 1:  # Links to find new prices
             url = line.copy()
 
-        elif index == 2: # get name always stored on line 2
+        elif index == 2:  # get name always stored on line 2
             graph_name = line.copy()
 
-        else: # line 3 onwards are all the price from old on top to new at the very bottom
+        else:  # line 3 onwards are all the price from old on top to new at the very bottom
             price = line.copy()
             item_date.append(price[-1])
             price.remove(price[-1])
@@ -94,7 +97,7 @@ def load(name):
         print('Retrieving new data')
         new_price, new_date = page.get_prices(url)
 
-    # Converst prices from str to float
+    # Converst prices from str to float (CHANGE TO SQL STUFF)
     for line_index, line in enumerate(all_prices):
         for price_index, price in enumerate(line):
             all_prices[line_index][price_index] = float(price)
@@ -104,19 +107,19 @@ def load(name):
         print("Drawing")
         draw_graph(all_prices, graph_name, item_date)
 
-    else:
-        with open(f'following/{name}.csv', 'a', newline='', encoding='UTF-8') as file:
+    else: # (CHANGE TO SQL STUFF)
+        with open(f'following/{name}.csv', 'a', newline='', encoding='UTF-8') as file: 
             writer = csv.writer(file)
             print("Adding new_price to all_prices and updating the file")
             store_price = new_price.copy()  # Make a copy to avoid modifying new_price
             store_price.append(new_date)
-            print(store_price)
             writer.writerow(store_price)
 
         load(name)
 
+
 def delete(name):
-    """Deletes anything that it wants to follow"""
+    # Deletes anything that it wants to follow
     if os.path.exists(f'following/{name}.csv'):
         os.remove(f'following/{name}.csv')
         print(f'Deleted {name}')
