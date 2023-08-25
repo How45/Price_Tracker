@@ -3,9 +3,7 @@ import helper as hp
 import page_retrival as page
 
 
-def graphic():
-    """UI graphic of page"""
-    # pylint: disable=anomalous-backslash-in-string
+def graphic():  # UI graphic of page
     print("""
          ___  ____   __   ____  _  _     ___  __   _  _  ____   __   ____  ____
         / __)(  _ \ / _\ (  _ \/ )( \   / __)/  \ ( \/ )(  _ \ / _\ (  _ \(  __)
@@ -19,8 +17,8 @@ def graphic():
     user = int(input(": "))
     return user
 
-def main():
-    """Control of all UI"""
+
+def main():  # Control of all UI
     index = graphic()
 
     if index == 1:
@@ -42,6 +40,7 @@ def main():
         hp.delete(name)
     else:
         print('ERROR: No key')
+
 
 if __name__ == '__main__':
     main()

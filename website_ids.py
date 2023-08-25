@@ -1,12 +1,12 @@
-def web_price(soup):
-    """All ids of the HTML page for Amazon and/or eBay"""
+def web_price(soup):  # All ids of the HTML page for Amazon and/or eBay
     identifiers = [
         'priceblock_ourprice',
         'priceblock_saleprice',
         'priceblock_dealprice',
         'prcIsum'
     ]
-    class_identifiers=[
+
+    class_identifiers = [
         'a-price-whole',
         'a-offscreen',
     ]
