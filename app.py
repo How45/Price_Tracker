@@ -24,7 +24,9 @@ def main():  # Control of all UI
     if index == 1:
 
         link_list, item_name, file_name = hp.get_links()
-        price_list, date = page.get_prices(link_list)
+        # price_list, date = page.get_prices(link_list)
+        price_list = [-1, -1]
+        date = ['09/08/23', '09/08/23']
         hp.initialise_data_graph(link_list, price_list, file_name, item_name, date)
         hp.draw_graph(price_list, item_name, date)
 

@@ -56,8 +56,6 @@ def get_links():
 
 def initialise_data_graph(links, prices, file_name, items, date):
     # Store Data for graph in CSV
-    sql.add_following(file_name)
-
     for price, item in zip(prices, items):
         sql.add_items(file_name, item, price, date)
 
