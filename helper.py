@@ -11,11 +11,9 @@ def list_change(price_list):  # PRODS DELETE
     # Transposing the list so prices in the same catergory are in a list.
     return [[i[index] for i in price_list] for index in range(len(price_list[0]))]
 
-
 def draw_graph(price_list, lst, date):
     # Draws graph
     colours = ["--b.", "--r.", "--g.", "--c.", "--m.", "--y.", "--k."]
-
     try:
         price_list = list_change(price_list)
     except TypeError:
@@ -23,9 +21,8 @@ def draw_graph(price_list, lst, date):
 
     # x_axis = np.array(date)
     y_axis = np.array(price_list)
-
     for i in range(len(price_list)):
-        plt.plot(date, y_axis[i], colours[i], label=lst[i])
+        plt.plot(date[i], y_axis[i], colours[i], label=lst[i])
     plt.legend()
 
     print('Press any key to close')
@@ -56,7 +53,7 @@ def get_links():
 
 def initialise_data_graph(links, prices, file_name, items, date):
     # Store Data for graph in CSV
-    for price, item in zip(prices, items):
+    for price, item, date in zip(prices, items, date):
         sql.add_items(file_name, item, price, date)
 
     for item, link in zip(items, links):
