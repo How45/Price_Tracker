@@ -4,7 +4,11 @@ from bs4 import BeautifulSoup
 import website_ids as web
 
 
-def get_prices(url_list):  # Gets prices from page
+def get_prices(url_list):
+    """
+    Gets prices from page
+    """
+
     prices_list = []
     for url in url_list:
         page = requests.get(url, headers={'User-Agent':'Mozilla/2.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'},timeout=10)
@@ -21,5 +25,5 @@ def get_prices(url_list):  # Gets prices from page
         else:
             prices_list.append(float(price[0:]))
 
-        dates = datetime.datetime.now().strftime('%d/%m/%Y')
+        dates = datetime.datetime.now().strftime('%Y-%m-%d')
     return prices_list, dates

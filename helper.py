@@ -1,28 +1,21 @@
-import csv
 import os
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import page_retrival as page
 import sql_commands as sql
+import app
 
-
-def list_change(price_list):  # PRODS DELETE
-    # Transposing the list so prices in the same catergory are in a list.
-    return [[i[index] for i in price_list] for index in range(len(price_list[0]))]
-
-def draw_graph(price_list, lst, date):
-    # Draws graph
-    colours = ["--b.", "--r.", "--g.", "--c.", "--m.", "--y.", "--k."]
-    try:
-        price_list = list_change(price_list)
-    except TypeError:
-        print("Single list")
+def draw_graph(price_list, items, dates):
+    """
+    Draws graph
+    """
+    colours = ("--b.", "--r.", "--g.", "--c.", "--m.", "--y.", "--k.")
 
     # x_axis = np.array(date)
     y_axis = np.array(price_list)
-    for i in range(len(price_list)):
-        plt.plot(date[i], y_axis[i], colours[i], label=lst[i])
+    for i, _ in enumerate(items):
+        plt.plot(dates, y_axis[i], colours[i], label=items[i])
     plt.legend()
 
     print('Press any key to close')
@@ -33,7 +26,9 @@ def draw_graph(price_list, lst, date):
 
 
 def get_links():
-    # gets links from user
+    """
+    gets links from user
+    """
     link_list, title_list = [], []
 
     file_name = input("Enter name of graph: ")
@@ -52,69 +47,65 @@ def get_links():
 
 
 def initialise_data_graph(links, prices, file_name, items, date):
-    # Store Data for graph in CSV
-    for price, item, date in zip(prices, items, date):
-        sql.add_items(file_name, item, price, date)
+    """
+    Store Data for graph in CSV
+    """
+    for item in items:
+        if sql.get_name(file_name):
+            print("Can't have the same file_name")
+            app.main()
 
-    for item, link in zip(items, links):
-        sql.add_links(item, link)
+    for link in (links):
+        sql.add_links(link)
+
+    links_id = sql.get_link_id(items, file_name)
+    print(links_id)
+
+    for price, item, date, link_id in zip(prices, items, date, links_id):
+        sql.add_items(file_name, item, price, date, link_id)
+    print("ADDED")
 
 
 def load(name):
-    # gets data from folder and update if needed
-    file = open(f'following/{name}.csv', 'r', encoding='UTF-8') # (CHANGE TO SQL STUFF)
-    reader = csv.reader(file)
+    """
+    gets data from folder and update if needed
+    """
+    attribute_data = sql.get_attributes(name)
+    item_name, all_prices, item_dates, url, link_id, new_prices = [], [], [], [], [], None
+    for item in attribute_data:
+        if item[0] not in item_name:
+            item_name.append(item[0])
+        if item[1] not in item_dates:
+            item_dates.append(item[1])
+        url.append(item[2])
+        if item[3] not in link_id:
+            link_id.append(item[3])
 
-    all_prices, graph_name, url, item_date, new_price = [], [], [], [], None
-    index = 0
+    for name in item_name:
+        prices = sql.get_prices(name)
+        all_prices.append([price[0] for price in prices])
 
-    # Get all info (CHANGE TO SQL STUFF)
-    for line in reader:
-        price = []
-        index += 1
-        if index == 1:  # Links to find new prices
-            url = line.copy()
-
-        elif index == 2:  # get name always stored on line 2
-            graph_name = line.copy()
-
-        else:  # line 3 onwards are all the price from old on top to new at the very bottom
-            price = line.copy()
-            item_date.append(price[-1])
-            price.remove(price[-1])
-            all_prices.append(price)
-
-    file.close()
-
-    # Doesn't need to retrieve data if date is in file
-    current_date = datetime.datetime.now().strftime('%d/%m/%Y')
-    if current_date not in item_date:
+    item_dates = [date.strftime('%Y-%m-%d') for date in item_dates]
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d')
+    if current_date not in item_dates:
         print('Retrieving new data')
-        new_price, new_date = page.get_prices(url)
+        new_prices, new_dates = page.get_prices(url)
 
-    # Converst prices from str to float (CHANGE TO SQL STUFF)
-    for line_index, line in enumerate(all_prices):
-        for price_index, price in enumerate(line):
-            all_prices[line_index][price_index] = float(price)
-
-    # Checks new prices and if its in the prices are the same to file
-    if not new_price or new_price == all_prices[-1]:
+    print(all_prices, item_name, item_dates)
+    if not new_prices or new_prices == all_prices[-1]:
         print("Drawing")
-        draw_graph(all_prices, graph_name, item_date)
+        draw_graph(all_prices, item_name, item_dates)
+    else:
+        print("Adding new_price to all_prices and updating the file")
+        sql.add_items(name, item_name, new_prices, new_dates, link_id)
 
-    else: # (CHANGE TO SQL STUFF)
-        with open(f'following/{name}.csv', 'a', newline='', encoding='UTF-8') as file: 
-            writer = csv.writer(file)
-            print("Adding new_price to all_prices and updating the file")
-            store_price = new_price.copy()  # Make a copy to avoid modifying new_price
-            store_price.append(new_date)
-            writer.writerow(store_price)
-
-        load(name)
+    load(name)
 
 
-def delete(name):
-    # Deletes anything that it wants to follow
+def delete(name): # CHANGE to SQL
+    """
+    Deletes anything that it wants to follow
+    """
     if os.path.exists(f'following/{name}.csv'):
         os.remove(f'following/{name}.csv')
         print(f'Deleted {name}')
