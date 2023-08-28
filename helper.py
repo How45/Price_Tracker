@@ -8,7 +8,7 @@ import sql_commands as sql
 
 
 def list_change(price_list):  # PRODS DELETE
-    # Transposing the list so prices in the same catergory are in a list.
+    # Transposing the list so prices in the same category are in a list.
     return [[i[index] for i in price_list] for index in range(len(price_list[0]))]
 
 
