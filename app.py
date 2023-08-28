@@ -2,6 +2,7 @@ import os
 import helper as hp
 import page_retrival as page
 
+# HI HELLO!!!
 
 def graphic():  # UI graphic of page
     print("""
