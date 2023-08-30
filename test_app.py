@@ -1,3 +1,4 @@
+"""testing module to test code"""
 import unittest
 import helper as hp
 import sql_commands as sql
@@ -18,6 +19,7 @@ class TestApp(unittest.TestCase):
 
         hp.initialise_data_graph(link_list, price_list, file_name, item_name, date)
 
+
     def test_drawgraph(self):
         """
         Test draw_graph
@@ -29,17 +31,27 @@ class TestApp(unittest.TestCase):
         date = ['09/08/23','09/08/23']
         hp.draw_graph(price_list, item_name, date)
 
+
     def test_load(self):
         """
         Test when user presses 2
         """
         hp.load('Pcs')
 
-    def test_getData(self):
+
+    def test_getdata(self):
         """
         Test on retrieving data
         """
         print(sql.get_attributes('Pcs'))
+
+    def test_getlink(self):
+        """
+        Test on retrieving Links
+        """
+        link_id = sql.get_link_id('Pcs')
+        print(tuple(link_id),type(tuple(link_id)))
+
 
 if __name__ == '__main__':
     unittest.main()

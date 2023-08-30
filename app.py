@@ -1,4 +1,4 @@
-import os
+"""importing files indirectory"""
 import helper as hp
 import page_retrival as page
 
@@ -32,15 +32,15 @@ def main():
         hp.draw_graph(price_list, item_name, date)
 
     elif index == 2:
-        print(os.listdir('following'))
-        name = input("Enter name of graph (without .csv): ")
+        print(hp.get_file_names())
+        file = input("Enter name of graph (without .csv): ")
 
-        hp.load(name)
+        hp.load(file)
 
     elif index == 3:
-        print(os.listdir('following'))
-        name = input("Enter name of graph (without .csv): ")
-        hp.delete(name)
+        print(hp.get_file_names())
+        file = input("Enter name of graph (without .csv): ")
+        hp.delete(file)
 
     else:
         print('ERROR: No key')

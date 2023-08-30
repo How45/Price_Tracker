@@ -1,4 +1,4 @@
-import os
+"""gets dates, plots graph, convertys to np array and imports files from directory"""
 import datetime
 import matplotlib.pyplot as plt
 import numpy as np
@@ -58,31 +58,32 @@ def initialise_data_graph(links, prices, file_name, items, date):
     for link in (links):
         sql.add_links(link)
 
-    links_id = sql.get_link_id(items, file_name)
-    print(links_id)
+    links_id = sql.get_link_id(file_name)
 
     for price, item, date, link_id in zip(prices, items, date, links_id):
         sql.add_items(file_name, item, price, date, link_id)
     print("ADDED")
 
 
-def load(name):
+def load(file):
     """
     gets data from folder and update if needed
     """
-    attribute_data = sql.get_attributes(name)
+    attribute_data = sql.get_attributes(file)
     item_name, all_prices, item_dates, url, link_id, new_prices = [], [], [], [], [], None
     for item in attribute_data:
         if item[0] not in item_name:
             item_name.append(item[0])
         if item[1] not in item_dates:
             item_dates.append(item[1])
-        url.append(item[2])
-        if item[3] not in link_id:
-            link_id.append(item[3])
 
-    for name in item_name:
-        prices = sql.get_prices(name)
+        url.append(item[2])
+
+        if item[3] not in link_id:
+                link_id.append(item[3])
+
+    for item in item_name:
+        prices = sql.get_prices(item)
         all_prices.append([price[0] for price in prices])
 
     item_dates = [date.strftime('%Y-%m-%d') for date in item_dates]
@@ -97,15 +98,21 @@ def load(name):
         draw_graph(all_prices, item_name, item_dates)
     else:
         print("Adding new_price to all_prices and updating the file")
-        sql.add_items(name, item_name, new_prices, new_dates, link_id)
+        sql.add_items(file, item_name, new_prices, new_dates, link_id)
 
-    load(name)
+    load(file)
 
 
-def delete(name): # CHANGE to SQL
+def delete(file): # CHANGE to SQL
     """
     Deletes anything that it wants to follow
     """
-    if os.path.exists(f'following/{name}.csv'):
-        os.remove(f'following/{name}.csv')
-        print(f'Deleted {name}')
+    link_id = sql.get_link_id(file)
+    sql.delete_following(file, tuple(link_id))
+
+def get_file_names():
+    """
+    Lists the names of groups that exits in the
+    """
+    files = sql.get_group_names()
+    return files

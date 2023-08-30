@@ -1,8 +1,12 @@
-import cred
+"""Imports file creds for connection & psycopg2 is to connect to postgres database"""
 import psycopg2
+import cred
 
 
-def connection():  # Gets creds to connect to server
+def connection():
+    """
+    Gets creds to connect to server
+    """
     conn = psycopg2.connect(database=cred.database,
                             host=cred.host,
                             user=cred.user,
@@ -12,6 +16,9 @@ def connection():  # Gets creds to connect to server
 
 
 def add_items(file_name, item_name, price, date, link_id):
+    """
+    Adds the item attributes
+    """
     conn = connection()
     cursor = conn.cursor()
     query = """INSERT INTO item_Listing (item_name, price, date, group_name, link_id) VALUES (%s,%s,%s,%s,%s);"""
@@ -23,6 +30,9 @@ def add_items(file_name, item_name, price, date, link_id):
 
 
 def add_links(link):
+    """
+    Adds item links to table
+    """
     conn = connection()
     cursor = conn.cursor()
     query = """INSERT INTO links (link) VALUES (%s);"""
@@ -34,14 +44,15 @@ def add_links(link):
     conn.close()
 
 
-def get_link_id(items, file):
+def get_link_id(file):
+    """
+    Gets the items link ids
+    """
     conn = connection()
     cursor = conn.cursor()
 
-    place_holders = ', '.join(['%s'] * len(items))
-    string = '%s'
-    query = f"""SELECT link_id FROM item_listing WHERE item_name IN ({place_holders}) AND group_name = {string};"""
-    cursor.execute(query, tuple(items)+ (file,))
+    query = """SELECT link_id FROM item_listing WHERE group_name = %s;"""
+    cursor.execute(query, (file,))
     data = cursor.fetchall()
     data = [int(d[0]) for d in data]
     cursor.close()
@@ -50,7 +61,10 @@ def get_link_id(items, file):
     return data
 
 
-def get_attributes(file): # change this!!!
+def get_attributes(file):
+    """
+    Gets the item attributes
+    """
     conn = connection()
     cursor = conn.cursor()
     query = """SELECT il.item_name, il.date, ln.link, il.link_id
@@ -66,6 +80,9 @@ def get_attributes(file): # change this!!!
 
 
 def get_prices(file):
+    """
+    Gets the prices of the item
+    """
     conn = connection()
     cursor = conn.cursor()
     query = """SELECT price
@@ -80,6 +97,9 @@ def get_prices(file):
 
 
 def get_name(file):
+    """
+    Gets the name of the item
+    """
     conn = connection()
     cursor = conn.cursor()
     query = """SELECT group_name, item_name
@@ -91,5 +111,34 @@ def get_name(file):
     cursor.close()
     conn.close()
     return data
-# Retrieve data
-# Detele a following
+
+
+def delete_following(file, link_id):
+    """
+    Detele a following
+    """
+    conn = connection()
+    cursor = conn.cursor()
+    query_items = """DELETE FROM item_listing WHERE group_name = %s;"""
+    query_link  = """DELETE FROM links WHERE id = (%s,%s);"""
+
+    cursor.execute(query_items, (file,))
+    cursor.execute(query_link, link_id)
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+
+def get_group_names():
+    """
+    Gets all group_names
+    """
+    conn = connection()
+    cursor = conn.cursor()
+    query = """SELECT DISTINCT group_name FROM item_listing"""
+    cursor.execute(query)
+    conn.commit()
+
+    cursor.close()
+    conn.close()

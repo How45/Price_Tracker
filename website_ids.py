@@ -1,4 +1,3 @@
-
 def web_price(soup):
     """
     All ids of the HTML page for Amazon and/or eBay

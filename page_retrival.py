@@ -1,3 +1,5 @@
+"""Gets datas, requests of url and gets html page with bs4.
+There is a file called web with all ids that can be found in AMAZON and EBAY"""
 import datetime
 import requests
 from bs4 import BeautifulSoup
