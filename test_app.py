@@ -51,6 +51,13 @@ class TestApp(unittest.TestCase):
         """
         link_id = sql.get_link_id('Pcs')
         print(tuple(link_id),type(tuple(link_id)))
+    
+
+    def test_files(self):
+        """
+        Test on retrieving group_names
+        """
+        print(hp.get_file_names())
 
 
 if __name__ == '__main__':

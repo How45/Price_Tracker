@@ -111,9 +111,11 @@ def delete(file): # CHANGE to SQL
     link_id = sql.get_link_id(file)
     sql.delete_following(file, tuple(link_id))
 
+
 def get_file_names():
     """
     Lists the names of groups that exits in the
     """
     files = sql.get_group_names()
+    files = [file[0] for file in files]
     return files
