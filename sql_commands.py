@@ -138,7 +138,8 @@ def get_group_names():
     cursor = conn.cursor()
     query = """SELECT DISTINCT group_name FROM item_listing"""
     cursor.execute(query)
-    conn.commit()
+    data = cursor.fetchall()
 
     cursor.close()
     conn.close()
+    return data

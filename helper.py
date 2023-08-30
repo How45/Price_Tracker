@@ -74,13 +74,14 @@ def load(file):
     for item in attribute_data:
         if item[0] not in item_name:
             item_name.append(item[0])
+
         if item[1] not in item_dates:
             item_dates.append(item[1])
 
         url.append(item[2])
 
         if item[3] not in link_id:
-                link_id.append(item[3])
+            link_id.append(item[3])
 
     for item in item_name:
         prices = sql.get_prices(item)
